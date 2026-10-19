@@ -6,7 +6,7 @@
 - **Группа:** ФИТ-241
 ## Ссылка на опубликованную страницу
  
-https://Sognatore-coder.github.io/vue-lab-5/
+https://sognatore-coder.github.io/vue-lab-5/
  
 ## Описание
  
