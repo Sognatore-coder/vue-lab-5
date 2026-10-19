@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Лабораторная №5 — Введение в Vue</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      background: #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button.active {
+      background: #42b883;
+      color: white;
+    }
+    .task {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input, button {
+      margin-top: 8px;
+      padding: 6px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <h1>Лабораторная №5 — Введение в Vue</h1>
+
+  <div class="tabs">
+    <button
+            v-for="(tab, i) in tabs"
+            :key="i"
+            :class="{ active: currentTab === i }"
+            @click="currentTab = i"
+    >
+      Задание {{ i + 1 }}
+    </button>
+  </div>
+
+  <div class="task">
+    <component :is="tabs[currentTab]"></component>
+  </div>
+</div>
+
+<script>
+  const { createApp, ref, computed, watch, onMounted, onUnmounted, defineComponent } = Vue
+
+  // Задание 1: Привет, Vue! (Options API: data)
+  const Task1 = defineComponent({
+    data() {
+      return {
+        name: 'Мир'
+      }
+    },
+    template: `
+      <div>
+        <h2>Задача 1. Привет, Vue!</h2>
+        <p>Привет, {{ name }}!</p>
+        <label>
+          Ваше имя:
+          <input v-model="name" placeholder="Введите имя" />
+        </label>
+      </div>
+    `
+  })
+
+  // Задание 2: Реактивный счётчик (ref + @click)
+  const Task2 = defineComponent({
+    setup() {
+      const count = ref(0)
+      const increment = () => {
+        count.value++
+      }
+      return { count, increment }
+    },
+    template: `
+      <div>
+        <h2>Задача 2. Реактивный счётчик</h2>
+        <p>Значение счётчика: <strong>{{ count }}</strong></p>
+        <button @click="increment">Увеличить</button>
+      </div>
+    `
+  })
+
+  // Задание 3: Условный рендеринг (v-if / v-else)
+  const Task3 = defineComponent({
+    setup() {
+      const visible = ref(false)
+      const toggle = () => {
+        visible.value = !visible.value
+      }
+      return { visible, toggle }
+    },
+    template: `
+      <div>
+        <h2>Задача 3. Условный рендеринг</h2>
+        <button @click="toggle">{{ visible ? 'Скрыть описание' : 'Показать описание' }}</button>
+        <p v-if="visible">
+          Vue — это прогрессивный JavaScript-фреймворк для создания пользовательских
+          интерфейсов. Он опирается на декларативный рендеринг и реактивность данных.
+        </p>
+        <p v-else>Описание скрыто.</p>
+      </div>
+    `
+  })
+
+  // Задание 4: Список элементов (v-for + :key)
+  const Task4 = defineComponent({
+    setup() {
+      const items = ref([
+        { id: 1, title: 'Изучить интерполяцию и v-model' },
+        { id: 2, title: 'Разобраться с ref и событиями' },
+        { id: 3, title: 'Освоить v-if и v-for' },
+        { id: 4, title: 'Попробовать computed и watch' }
+      ])
+      return { items }
+    },
+    template: `
+      <div>
+        <h2>Задача 4. Список элементов</h2>
+        <ul>
+          <li v-for="(item, index) in items" :key="item.id">
+            {{ index + 1 }}. {{ item.title }}
+          </li>
+        </ul>
+      </div>
+    `
+  })
+
+  // Задание 5: Мини-форма (v-model, @submit.prevent, массивы)
+  const Task5 = defineComponent({
+    setup() {
+      const name = ref('')
+      const age = ref('')
+      const people = ref([])
+
+      const addPerson = () => {
+        const trimmed = name.value.trim()
+        if (!trimmed || age.value === '' || age.value === null) return
+        people.value.push({
+          id: Date.now() + Math.random(),
+          name: trimmed,
+          age: age.value
+        })
+        name.value = ''
+        age.value = ''
+      }
+
+      return { name, age, people, addPerson }
+    },
+    template: `
+      <div>
+        <h2>Задача 5. Мини-форма</h2>
+        <form @submit.prevent="addPerson">
+          <div>
+            <input v-model="name" placeholder="Имя" />
+          </div>
+          <div>
+            <input v-model.number="age" type="number" min="0" placeholder="Возраст" />
+          </div>
+          <button type="submit">Добавить</button>
+        </form>
+
+        <p v-if="people.length === 0">Список пока пуст.</p>
+        <ul v-else>
+          <li v-for="person in people" :key="person.id">
+            {{ person.name }}, {{ person.age }}
+          </li>
+        </ul>
+      </div>
+    `
+  })
+
+  // Задание 6: Вычисляемые свойства (computed)
+  const Task6 = defineComponent({
+    setup() {
+      const num = ref(2)
+      const value = computed(() => Number(num.value) || 0)
+      const square = computed(() => value.value ** 2)
+      const cube = computed(() => value.value ** 3)
+      return { num, value, square, cube }
+    },
+    template: `
+      <div>
+        <h2>Задача 6. Вычисляемые свойства</h2>
+        <label>
+          Число:
+          <input v-model.number="num" type="number" />
+        </label>
+        <ul>
+          <li>Число: {{ value }}</li>
+          <li>Квадрат: {{ square }}</li>
+          <li>Куб: {{ cube }}</li>
+        </ul>
+      </div>
+    `
+  })
+
+  // Задание 7: Watch и жизненный цикл (onMounted, watch)
+  const Task7 = defineComponent({
+    setup() {
+      const now = ref(new Date())
+      let timerId = null
+
+      const timeString = computed(() => now.value.toLocaleTimeString('ru-RU'))
+
+      const greeting = computed(() => {
+        const hour = now.value.getHours()
+        if (hour >= 5 && hour < 12) return 'Доброе утро'
+        if (hour >= 12 && hour < 18) return 'Добрый день'
+        if (hour >= 18 && hour < 23) return 'Добрый вечер'
+        return 'Доброй ночи'
+      })
+
+      watch(now, (newTime) => {
+        console.log('Время обновлено:', newTime.toLocaleTimeString('ru-RU'))
+      })
+
+      onMounted(() => {
+        timerId = setInterval(() => {
+          now.value = new Date()
+        }, 1000)
+      })
+
+      // останавливаем таймер при переключении вкладки
+      onUnmounted(() => {
+        clearInterval(timerId)
+      })
+
+      return { timeString, greeting }
+    },
+    template: `
+      <div>
+        <h2>Задача 7. Watch и жизненный цикл</h2>
+        <p>Текущее время: <strong>{{ timeString }}</strong></p>
+        <p>{{ greeting }}!</p>
+        <p><small>Сообщения об обновлении времени выводятся в консоль браузера.</small></p>
+      </div>
+    `
+  })
+
+  createApp({
+    setup() {
+      const currentTab = ref(0)
+      const tabs = [Task1, Task2, Task3, Task4, Task5, Task6, Task7]
+      return { currentTab, tabs }
+    }
+  }).mount('#app')
+</script>
+</body>
+</html>
